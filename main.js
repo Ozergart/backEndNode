@@ -23,16 +23,13 @@
         await fs.writeFile(usersFilePath, JSON.stringify(users))
         console.log('база данных оновлена');
     }
-    (async () => {
+    app.get('/users', async (req, res) => {
         await readFile();
-    })();
-
-
-    app.get('/users', (req, res) => {
         res.json(users).status(200)
     })
     app.post(`/users`, async  (req,res)=>{
-       const user = {
+        await readFile();
+        const user = {
            id: users[users.length - 1].id + 1,
            name: req.body.name,
            password: req.body.password,
@@ -42,11 +39,13 @@
         await writeFile()
         res.status(201).json(user)
     })
-    app.get('/users/:userId',(req,res)=>{
+    app.get('/users/:userId', async (req,res)=>{
+        await readFile();
         const user = users.find(user => user.id === +req.params.userId)
         res.json(user)
     })
     app.delete('/users/:userId',async (req,res)=>{
+        await readFile();
         const userIndex = users.findIndex(user=> user.id === +req.params.userId)
         if(userIndex === -1 ){
             res.sendStatus(404)
@@ -58,6 +57,7 @@
         }
     })
     app.put(`/users/:userId`, async (req,res)=>{
+        await readFile();
         const userIndex = users.findIndex(user=> user.id === +req.params.userId)
         if(userIndex === -1 ){
             res.sendStatus(404)
