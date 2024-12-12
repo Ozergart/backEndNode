@@ -1,7 +1,8 @@
 import dotenv from "dotenv";
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 
-import { readFile, writeFile } from "./fs.service";
+import { ApiError } from "./errors/api-error";
+import { userRouter } from "./routers/user.router";
 
 const app = express();
 
@@ -10,56 +11,29 @@ dotenv.config();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use("/users", userRouter);
+
+app.use(
+  "*",
+  (
+    error: ApiError | Error,
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    if (error instanceof ApiError) {
+      res.status(error.status).json({ message: error.message });
+    } else if (error instanceof Error) {
+      res.status(500).json({ message: "something was wrong" });
+    }
+  },
+);
+process.on("uncaughtException", (error) => {
+  console.error("uncaughtException", error.message);
+  process.exit(1);
+});
+
 const port = process.env.PORT || 3000;
-
-let users = [];
-
-app.get("/users", async (req: Request, res: Response) => {
-  users = await readFile();
-  res.json(users).status(200);
-});
-app.post("/users", async (req: Request, res: Response) => {
-  users = await readFile();
-  const user = {
-    id: users[users.length - 1].id + 1,
-    name: req.body.name,
-    password: req.body.password,
-    email: req.body.email,
-  };
-  users.push(user);
-  await writeFile(users);
-  res.status(201).json(user);
-});
-app.get("/users/:userId", async (req: Request, res: Response) => {
-  users = await readFile();
-  const user = users.find((user) => user.id === +req.params.userId);
-  res.json(user);
-});
-app.delete("/users/:userId", async (req: Request, res: Response) => {
-  users = await readFile();
-  const userIndex = users.findIndex((user) => user.id === +req.params.userId);
-  if (userIndex === -1) {
-    res.sendStatus(404);
-  } else {
-    users.splice(userIndex, 1);
-    await writeFile(users);
-    res.sendStatus(204);
-  }
-});
-app.put("/users/:userId", async (req: Request, res: Response) => {
-  users = await readFile();
-  const userIndex = users.findIndex((user) => user.id === +req.params.userId);
-  if (userIndex === -1) {
-    res.sendStatus(404);
-  } else {
-    users[userIndex].email = req.body.email;
-    users[userIndex].name = req.body.name;
-    users[userIndex].password = req.body.password;
-    const user = users[userIndex];
-    await writeFile(users);
-    res.status(201).json(user);
-  }
-});
 app.listen(port, () => {
   console.log(`Server work on http://localhost:${port}`);
 });
