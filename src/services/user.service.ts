@@ -8,13 +8,13 @@ class UserService {
   public async create(dto: Partial<IUser>): Promise<IUser> {
     return await userRepository.create(dto);
   }
-  public async getById(id: number): Promise<IUser> {
+  public async getById(id: string): Promise<IUser> {
     return await userRepository.getById(id);
   }
-  public async changeUser(id: number, dto: Partial<IUser>): Promise<IUser> {
+  public async changeUser(id: string, dto: Partial<IUser>): Promise<IUser> {
     return await userRepository.changeUser(id, dto);
   }
-  public async delete(id: number): Promise<void> {
+  public async delete(id: string): Promise<void> {
     await userRepository.delete(id);
   }
 }

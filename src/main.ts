@@ -1,12 +1,11 @@
-import dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
+import mongoose from "mongoose";
 
+import { configs } from "./configs/configs";
 import { ApiError } from "./errors/api-error";
 import { userRouter } from "./routers/user.router";
 
 const app = express();
-
-dotenv.config();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -34,6 +33,7 @@ process.on("uncaughtException", (error) => {
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
+app.listen(port, async () => {
+  await mongoose.connect(configs.mongoURL);
   console.log(`Server work on http://localhost:${port}`);
 });
