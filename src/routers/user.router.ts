@@ -18,11 +18,6 @@ router.put(
   commonMiddlewares.validateBody(UserValidator.updateUser),
   userController.changeUser,
 );
-router.post(
-  "/",
-  commonMiddlewares.validateBody(UserValidator.createUser),
-  userController.create,
-);
 router.delete(
   "/:userId",
   commonMiddlewares.isIdValid("userId"),

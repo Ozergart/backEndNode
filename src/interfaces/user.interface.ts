@@ -11,3 +11,8 @@ export interface IUser {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type IUserCreateDto = Pick<
+  IUser,
+  "name" | "email" | "age" | "password" | "phone"
+>;
