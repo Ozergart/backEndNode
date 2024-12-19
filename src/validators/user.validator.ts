@@ -21,8 +21,8 @@ export class UserValidator {
   });
 
   public static updateUser = joi.object({
-    name: UserValidator.userName.required(),
-    age: UserValidator.age.required(),
-    phone: UserValidator.phone.required(),
+    name: UserValidator.userName,
+    age: UserValidator.age,
+    phone: UserValidator.phone,
   });
 }
