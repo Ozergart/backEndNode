@@ -1,5 +1,6 @@
 import { IUser } from "../interfaces/user.interface";
 import { User } from "../models/user.model";
+import { passwordService } from "../services/password.service";
 
 class UserRepository {
   public async getList(): Promise<IUser[]> {
@@ -15,7 +16,8 @@ class UserRepository {
     await User.findByIdAndDelete(id);
   }
   public async create(dto: Partial<IUser>): Promise<IUser> {
-    return await User.create(dto);
+    const password = await passwordService.hashPassword(dto.password);
+    return await User.create({ ...dto, password });
   }
 }
 export const userRepository = new UserRepository();
